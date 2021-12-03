@@ -15,8 +15,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     int MaxHours=0;
     int myTotalHours=0;
     int myHour=0;
+    int myFees=0;
     int totalFees=0;
 
     @Override
@@ -64,16 +63,37 @@ public class MainActivity extends AppCompatActivity {
                     alertDialogBuilder.show();
                 }
                 else if(MaxHours!=0){
-                    if(myHour+myTotalHours<MaxHours){
+                    if(myHour+myTotalHours<MaxHours&&!myCourses.contains(myCourse)){
                         myTotalHours=myTotalHours+myHour;
+                        totalFees=totalFees+myFees;
                         myCourses.add(myCourse);
                         Toast.makeText(MainActivity.this, "Course Added Succeessfully", Toast.LENGTH_SHORT).show();
                         lblTotalHours.setText(Integer.toString(myTotalHours));
+                        lblTotalFees.setText(Integer.toString(totalFees));
+                    }
+
+                    else if(myHour+myTotalHours>MaxHours&&myCourses.contains(myCourse)){
+                        Toast.makeText(MainActivity.this, "Course Can not be added", Toast.LENGTH_SHORT).show();
                     }
                     else {
-
+                        Toast.makeText(MainActivity.this, "Course already exists", Toast.LENGTH_SHORT).show();
                     }
                 }
+            }
+        });
+        btnCalculate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(ckbAccomodation.isChecked()){
+                    totalFees=totalFees+1000;
+                }
+                if(ckbMedicalInsurance.isChecked()){
+                    totalFees=totalFees+700;
+                }
+                AlertDialog.Builder alertBuilder=new AlertDialog.Builder(MainActivity.this);
+                alertBuilder.setMessage("Total fees: $"+totalFees);
+                alertBuilder.setNeutralButton("Ok",null);
+                alertBuilder.show();
             }
         });
         ArrayAdapter pickerAdapter=new ArrayAdapter(this,R.layout.support_simple_spinner_dropdown_item,courseNames);
@@ -83,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 lblFees.setText(Integer.toString(courses.get(position).getFees()));
                 myHour=courses.get(position).getHoursPerWeek();
+                myFees=courses.get(position).getFees();
                 myCourse=courses.get(position);
                 lblHours.setText(Integer.toString(courses.get(position).getHoursPerWeek()));
             }
